@@ -1,4 +1,4 @@
-# Project 5: AI Legal Assistant Subnet
+# AI Legal Assistant Subnet
 
 ## Overview
 A decentralized legal advisory platform powered by Bittensor. Legal experts and AI models collaborate to provide accessible, transparent, and affordable legal guidance with on-chain reputation and token incentives.
