@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Legal Assistant Subnet</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0a0f1c;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #0d1b3e 0%, #1a2a5e 100%);
+            border-bottom: 2px solid #c5a355;
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header h1 {
+            font-size: 24px;
+            color: #ffffff;
+        }
+        .header h1 span { color: #c5a355; }
+        .header .subtitle {
+            color: #8899bb;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+        .header .subnet-badge {
+            background: #c5a355;
+            color: #0d1b3e;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        /* Main layout */
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 30px 40px;
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 30px;
+        }
+
+        /* Cards */
+        .card {
+            background: #111827;
+            border: 1px solid #1e2a4a;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .card h2 {
+            color: #c5a355;
+            font-size: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Query form */
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            color: #8899bb;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+        .form-group select, .form-group textarea, .form-group input {
+            width: 100%;
+            background: #0a0f1c;
+            border: 1px solid #1e2a4a;
+            color: #e0e0e0;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .form-group select:focus, .form-group textarea:focus, .form-group input:focus {
+            outline: none;
+            border-color: #c5a355;
+        }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #c5a355, #a8893a);
+            color: #0d1b3e;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-submit:hover { background: linear-gradient(135deg, #d4b366, #c5a355); }
+        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Right panel */
+        .right-panel { display: flex; flex-direction: column; gap: 20px; }
+
+        /* Best response */
+        .best-response .summary-text {
+            background: #0a0f1c;
+            padding: 16px;
+            border-radius: 8px;
+            line-height: 1.7;
+            font-size: 14px;
+            border-left: 3px solid #c5a355;
+            margin-bottom: 16px;
+        }
+        .citation-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: #0a0f1c;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+        .citation-verified {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .citation-verified.true {
+            background: #064e3b;
+            color: #34d399;
+        }
+        .citation-verified.false {
+            background: #7f1d1d;
+            color: #f87171;
+        }
+        .relevance-bar {
+            width: 60px;
+            height: 6px;
+            background: #1e2a4a;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .relevance-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: #c5a355;
+        }
+        .recommendation-text {
+            background: #0a0f1c;
+            padding: 16px;
+            border-radius: 8px;
+            line-height: 1.7;
+            font-size: 14px;
+            border-left: 3px solid #34d399;
+        }
+
+        /* Miner ranking table */
+        .miner-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .miner-table th {
+            text-align: left;
+            padding: 10px 12px;
+            color: #8899bb;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #1e2a4a;
+        }
+        .miner-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #0d1b3e;
+        }
+        .miner-table tr.rank-1 { background: rgba(197, 163, 85, 0.08); }
+        .miner-table tr.rank-low { opacity: 0.7; }
+
+        .score-badge {
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .score-high { background: #064e3b; color: #34d399; }
+        .score-mid { background: #3b3a1a; color: #c5a355; }
+        .score-low { background: #7f1d1d; color: #f87171; }
+
+        .tao-amount { color: #c5a355; font-weight: 600; }
+
+        /* Validator scores */
+        .score-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .score-item {
+            background: #0a0f1c;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .score-item .score-label {
+            font-size: 11px;
+            color: #8899bb;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .score-item .score-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #c5a355;
+            margin-top: 4px;
+        }
+        .score-item .score-weight {
+            font-size: 10px;
+            color: #556688;
+            margin-top: 2px;
+        }
+
+        /* Meta info */
+        .meta-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .meta-item {
+            background: #0a0f1c;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+        .meta-item .meta-label { color: #556688; }
+        .meta-item .meta-value { color: #c5a355; font-weight: 600; margin-left: 6px; }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #556688;
+        }
+        .loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #1e2a4a;
+            border-top-color: #c5a355;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Placeholder */
+        .placeholder {
+            text-align: center;
+            padding: 80px 40px;
+            color: #334466;
+        }
+        .placeholder .icon { font-size: 48px; margin-bottom: 16px; }
+        .placeholder p { font-size: 14px; line-height: 1.6; }
+
+        /* Section labels */
+        .section-label {
+            font-size: 13px;
+            color: #8899bb;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 20px 0 10px;
+            font-weight: 600;
+        }
+        .section-label:first-child { margin-top: 0; }
+
+        /* Hallucination highlight */
+        .hallucination-alert {
+            background: rgba(127, 29, 29, 0.2);
+            border: 1px solid #7f1d1d;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 16px;
+            font-size: 13px;
+            color: #f87171;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div>
+        <h1><span>AI Legal Assistant</span> Subnet</h1>
+        <div class="subtitle">Decentralized Legal Advisory &mdash; Powered by Bittensor &amp; Yuma Consensus</div>
+    </div>
+    <div class="subnet-badge">SUBNET #87 &bull; LIVE</div>
+</div>
+
+<div class="container">
+    <!-- Left: Query Panel -->
+    <div>
+        <div class="card">
+            <h2>&#9878; Submit Legal Query</h2>
+            <div class="form-group">
+                <label>Case Type</label>
+                <select id="caseType">
+                    <option value="tenant_rights">Tenant Rights</option>
+                    <option value="employment_law">Employment Law</option>
+                    <option value="contract_dispute">Contract Dispute</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Jurisdiction</label>
+                <select id="jurisdiction">
+                    <option value="US-CA">United States - California</option>
+                    <option value="US-NY">United States - New York</option>
+                    <option value="US-Federal">United States - Federal</option>
+                    <option value="UK">United Kingdom</option>
+                    <option value="EU">European Union</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Describe Your Legal Issue</label>
+                <textarea id="description" placeholder="e.g. My landlord refuses to return my security deposit after move-out..."></textarea>
+            </div>
+            <button class="btn-submit" id="submitBtn" onclick="submitQuery()">
+                Broadcast to Subnet Miners
+            </button>
+        </div>
+
+        <!-- Validator Scores Card -->
+        <div class="card" style="margin-top: 20px; display: none;" id="scoresCard">
+            <h2>&#9745; Validator Verification Scores</h2>
+            <div class="score-grid" id="scoreGrid"></div>
+        </div>
+    </div>
+
+    <!-- Right: Results Panel -->
+    <div class="right-panel">
+        <div id="placeholder" class="card placeholder">
+            <div class="icon">&#9878;</div>
+            <p>Submit a legal query to broadcast it to all miners on the subnet.<br>
+            Miners will compete to provide the best legal analysis.<br>
+            Validators will verify every citation against legal databases.</p>
+        </div>
+
+        <div id="loading" class="card loading" style="display:none;">
+            <div class="spinner"></div>
+            <p>Broadcasting query to 6 miners on Subnet #87...</p>
+            <p style="font-size:12px; margin-top:8px; color:#334466;">Validators verifying citations against Cornell LII &amp; CourtListener...</p>
+        </div>
+
+        <div id="results" style="display:none;">
+            <!-- Meta -->
+            <div class="meta-row" id="metaRow"></div>
+
+            <!-- Best Response -->
+            <div class="card best-response">
+                <h2>&#9733; Best Miner Response</h2>
+                <div id="bestMinerInfo" style="font-size:12px; color:#8899bb; margin-bottom:12px;"></div>
+
+                <div class="section-label">Legal Analysis</div>
+                <div class="summary-text" id="summaryText"></div>
+
+                <div class="section-label">Verified Citations</div>
+                <div id="citationsList"></div>
+
+                <div id="hallucinationAlert" class="hallucination-alert" style="display:none;"></div>
+
+                <div class="section-label" style="margin-top:20px;">Recommendation</div>
+                <div class="recommendation-text" id="recommendationText"></div>
+            </div>
+
+            <!-- Miner Ranking -->
+            <div class="card" style="margin-top:20px;">
+                <h2>&#9776; Miner Competition Results</h2>
+                <table class="miner-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Model</th>
+                            <th>UID</th>
+                            <th>Score</th>
+                            <th>Citations</th>
+                            <th>Hallucinated</th>
+                            <th>Latency</th>
+                            <th>TAO Reward</th>
+                        </tr>
+                    </thead>
+                    <tbody id="minerTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function submitQuery() {
+    const btn = document.getElementById('submitBtn');
+    const placeholder = document.getElementById('placeholder');
+    const loading = document.getElementById('loading');
+    const results = document.getElementById('results');
+    const scoresCard = document.getElementById('scoresCard');
+
+    btn.disabled = true;
+    btn.textContent = 'Broadcasting...';
+    placeholder.style.display = 'none';
+    results.style.display = 'none';
+    scoresCard.style.display = 'none';
+    loading.style.display = 'block';
+
+    const body = {
+        user_id: "user_" + Math.random().toString(36).substr(2, 6),
+        case_type: document.getElementById('caseType').value,
+        description: document.getElementById('description').value || "Legal issue requiring analysis",
+        jurisdiction: document.getElementById('jurisdiction').value,
+    };
+
+    try {
+        const res = await fetch('/advice', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        renderResults(data);
+    } catch (err) {
+        alert('Error: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Broadcast to Subnet Miners';
+        loading.style.display = 'none';
+    }
+}
+
+function renderResults(data) {
+    const results = document.getElementById('results');
+    const scoresCard = document.getElementById('scoresCard');
+    results.style.display = 'block';
+    scoresCard.style.display = 'block';
+
+    // Meta
+    document.getElementById('metaRow').innerHTML = `
+        <div class="meta-item"><span class="meta-label">Query ID</span><span class="meta-value">${data.query_id}</span></div>
+        <div class="meta-item"><span class="meta-label">Block</span><span class="meta-value">#${data.block_number.toLocaleString()}</span></div>
+        <div class="meta-item"><span class="meta-label">Miners Responded</span><span class="meta-value">${data.num_miners_responded}</span></div>
+        <div class="meta-item"><span class="meta-label">Citations Verified</span><span class="meta-value">${data.num_citations_verified}</span></div>
+        <div class="meta-item"><span class="meta-label">Consensus</span><span class="meta-value">${data.consensus_method}</span></div>
+    `;
+
+    // Best miner info
+    const best = data.best_response;
+    document.getElementById('bestMinerInfo').innerHTML =
+        `Miner UID <strong>${best.miner_uid}</strong> &bull; <strong>${best.model_name}</strong> &bull; ${best.response_time_ms}ms &bull; Hotkey: <code style="font-size:11px;color:#556688;">${best.miner_hotkey.slice(0,20)}...</code>`;
+
+    // Summary
+    document.getElementById('summaryText').textContent = best.summary;
+
+    // Citations
+    const citList = document.getElementById('citationsList');
+    citList.innerHTML = '';
+    let hallucinatedCount = 0;
+    best.citations.forEach(c => {
+        if (!c.verified) hallucinatedCount++;
+        const relPct = Math.max(0, Math.min(100, c.relevance_score * 100));
+        citList.innerHTML += `
+            <div class="citation-item">
+                <span class="citation-verified ${c.verified}">${c.verified ? 'VERIFIED' : 'FAILED'}</span>
+                <span style="flex:1;">${c.statute}</span>
+                <div class="relevance-bar"><div class="relevance-bar-fill" style="width:${relPct}%;"></div></div>
+                <span style="font-size:11px;color:#556688;width:40px;text-align:right;">${(c.relevance_score).toFixed(2)}</span>
+            </div>`;
+    });
+
+    // Hallucination alert (for lower-ranked miners info)
+    const alertEl = document.getElementById('hallucinationAlert');
+    const totalHallucinated = data.all_miner_results.reduce((sum, r) =>
+        sum + r.miner.citations.filter(c => !c.verified).length, 0);
+    if (totalHallucinated > 0) {
+        alertEl.style.display = 'block';
+        alertEl.innerHTML = `&#9888; Validators detected <strong>${totalHallucinated} hallucinated citation(s)</strong> across all miners. Miners with fabricated citations received significantly lower scores and TAO rewards.`;
+    } else {
+        alertEl.style.display = 'none';
+    }
+
+    // Recommendation
+    document.getElementById('recommendationText').textContent = best.recommendation;
+
+    // Validator scores
+    const s = data.best_score;
+    document.getElementById('scoreGrid').innerHTML = `
+        <div class="score-item">
+            <div class="score-label">Citation Accuracy</div>
+            <div class="score-value">${(s.citation_accuracy * 100).toFixed(0)}%</div>
+            <div class="score-weight">Weight: 35%</div>
+        </div>
+        <div class="score-item">
+            <div class="score-label">Legal Relevance</div>
+            <div class="score-value">${(s.legal_relevance * 100).toFixed(0)}%</div>
+            <div class="score-weight">Weight: 25%</div>
+        </div>
+        <div class="score-item">
+            <div class="score-label">Completeness</div>
+            <div class="score-value">${(s.completeness * 100).toFixed(0)}%</div>
+            <div class="score-weight">Weight: 15%</div>
+        </div>
+        <div class="score-item">
+            <div class="score-label">Jurisdiction</div>
+            <div class="score-value">${(s.jurisdiction_accuracy * 100).toFixed(0)}%</div>
+            <div class="score-weight">Weight: 15%</div>
+        </div>
+    `;
+
+    // Miner table
+    const tbody = document.getElementById('minerTableBody');
+    tbody.innerHTML = '';
+    data.all_miner_results.forEach(r => {
+        const m = r.miner;
+        const sc = r.validator_scores;
+        const hallucinated = m.citations.filter(c => !c.verified).length;
+        const scoreClass = sc.total_score >= 0.8 ? 'score-high' : sc.total_score >= 0.6 ? 'score-mid' : 'score-low';
+        const rowClass = r.rank <= 2 ? 'rank-1' : r.rank >= 5 ? 'rank-low' : '';
+
+        tbody.innerHTML += `
+            <tr class="${rowClass}">
+                <td><strong>#${r.rank}</strong></td>
+                <td>${m.model_name}</td>
+                <td style="color:#556688;">${m.miner_uid}</td>
+                <td><span class="score-badge ${scoreClass}">${sc.total_score.toFixed(3)}</span></td>
+                <td>${m.citations.length}</td>
+                <td>${hallucinated > 0 ? '<span style="color:#f87171;font-weight:600;">' + hallucinated + ' FAKE</span>' : '<span style="color:#34d399;">0</span>'}</td>
+                <td style="color:#556688;">${m.response_time_ms}ms</td>
+                <td class="tao-amount">${r.tao_reward.toFixed(6)} &#964;</td>
+            </tr>`;
+    });
+}
+</script>
+
+</body>
+</html>
