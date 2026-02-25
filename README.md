@@ -1,42 +1,97 @@
 # AI Legal Assistant Subnet
 
-## Overview
-A decentralized legal advisory platform powered by Bittensor. Legal experts and AI models collaborate to provide accessible, transparent, and affordable legal guidance with on-chain reputation and token incentives.
+**Subnet #5 — Bittensor Ideathon**
+
+A decentralized legal advisory platform on Bittensor. Miners compete to provide the most accurate legal analysis across multiple jurisdictions. Validators verify legal references and advice quality against authoritative legal databases. Rewards ($TAO) are distributed via Yuma Consensus.
+
+## Quick Start (For Judges)
+
+```bash
+# 1. Clone & enter directory
+git clone https://github.com/yt2025id-lab/bittensor-legal.git
+cd bittensor-legal
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Start the server
+uvicorn main:app --reload --port 8000
+
+# 4. Open in browser
+open http://localhost:8000
+```
+
+### What You'll See
+
+- **Interactive Web UI** at `http://localhost:8000` — click any of the 3 demo scenarios
+- **Swagger API Docs** at `http://localhost:8000/docs` — test all endpoints interactively
+- **ReDoc** at `http://localhost:8000/redoc` — clean API reference
+
+### Demo Scenarios
+
+| # | Scenario | Task Type |
+|---|----------|-----------|
+| 1 | Cross-border IP infringement — US/EU jurisdiction | Legal Analysis |
+| 2 | Smart contract dispute — DeFi protocol liability | Contract Review |
+| 3 | Data privacy compliance — GDPR vs CCPA assessment | Compliance Check |
+
+Each demo broadcasts a legal challenge to 6 simulated miners, scores their analysis through 3-4 validators, and distributes TAO rewards via Yuma Consensus.
 
 ## Features
-- AI-driven legal advice and summaries
-- Document review and compliance checking
-- Multi-jurisdiction legal reference
-- On-chain reputation and validation
-- Bittensor subnet integration with $TAO rewards
 
-## Getting Started
-1. Install dependencies: `pip install -r requirements.txt`
-2. Run the app: `python main.py`
-3. Submit legal queries via `/advice` endpoint
+- 6 specialized legal AI miners (LegalBERT, StatuteNet, CaseLaw-GPT, etc.)
+- 3-4 validators with legal database verification pipelines
+- Multi-jurisdiction legal analysis with citation references
+- Real-time scoring: citation accuracy, relevance, completeness, latency
+- TAO reward distribution via Yuma Consensus
+- Full miner/validator CRUD, leaderboard, and network status APIs
 
 ## Folder Structure
-- `main.py`: Entry point (FastAPI)
-- `legal/`: Core logic
-  - `ai.py`: AI legal analysis engine
-  - `models.py`: Data models (LegalQuery, LegalResponse)
-  - `routes.py`: API routes
-  - `db.py`: Database operations
-- `overview.md`: Full project documentation
-- `pitchdeck/`: Presentation materials
-- `requirements.txt`: Dependencies
 
-## Bittensor Subnet Design
-- **Miner:** Analyzes legal queries, generates advice with jurisdiction-specific references
-- **Validator:** Verifies accuracy of legal references, assesses advice quality and relevance
-- **Incentive:** $TAO rewards based on reference accuracy and user satisfaction
+```
+main.py                  # FastAPI entry point
+legal/
+  __init__.py
+  ai.py                  # AI legal analysis engine (3 demo scenarios, 6 miners)
+  db.py                  # In-memory DB (miners, validators, challenges)
+  models.py              # Pydantic data models
+  routes.py              # 20+ API endpoints
+static/
+  index.html             # Interactive demo UI
+  app.js                 # Frontend logic
+  style.css              # Dark theme styling
+overview.md              # Full technical documentation
+pitchdeck/               # Pitch deck materials
+SUBNET_PROPOSAL.md       # Detailed subnet design proposal
+```
+
+## Scoring Formula
+
+```
+final_score = (0.40 × citation_accuracy + 0.25 × relevance
+             + 0.15 × completeness + 0.10 × latency + 0.10 × consistency)
+             × 1.5 if precedent-setting case correctly identified
+```
+
+## Subnet Parameters
+
+- **Subnet ID:** 5 | **Tempo:** 360 blocks (~72 min) | **Max UIDs:** 256
+- **Emission Split:** Owner 18% | Miners 41% | Validators+Stakers 41%
+
+## Miner Tasks
+
+| Task | Weight | Description |
+|------|--------|-------------|
+| Legal Analysis | 50% | Case analysis with jurisdiction-specific legal reasoning |
+| Contract Review | 30% | Smart contract and legal document review |
+| Compliance Check | 20% | Regulatory compliance assessment across frameworks |
 
 ## License
+
 MIT
 
-## Subnet Design Proposal
-See [`SUBNET_PROPOSAL.md`](SUBNET_PROPOSAL.md) for the full technical subnet design proposal, including incentive mechanism, miner/validator design, business logic, and go-to-market strategy.
+## Documentation
 
-## Full Documentation
-See `overview.md` for detailed problem/solution, architecture, and mechanism design.
-See `pitchdeck/` for pitch deck, demo video script, and visual guide.
+- [`SUBNET_PROPOSAL.md`](SUBNET_PROPOSAL.md) — Full technical subnet design proposal
+- [`overview.md`](overview.md) — Problem/solution, architecture, mechanism design
+- [`pitchdeck/`](pitchdeck/) — Pitch deck and demo video script
